@@ -134,10 +134,13 @@ blur {
     saturation 2
 }
 
-spawn-at-startup "/usr/bin/noctalia"
-spawn-at-startup "solaar"
-spawn-at-startup "kdeconnect-app"
-spawn-at-startup "/usr/libexec/lxqt-policykit-agent"
+// Wait for niri's renderer before starting X11-capable apps.  Starting them
+// earlier makes niri open Xwayland before EGL is ready, which loses DRI3 and
+// forces every X11 client (including Steam) onto llvmpipe.
+spawn-at-startup "/home/fasol/.local/bin/niri-ready-exec" "/usr/bin/noctalia"
+spawn-at-startup "/home/fasol/.local/bin/niri-ready-exec" "solaar"
+spawn-at-startup "/home/fasol/.local/bin/niri-ready-exec" "kdeconnect-app"
+spawn-at-startup "/home/fasol/.local/bin/niri-ready-exec" "/usr/libexec/lxqt-policykit-agent"
 spawn-sh-at-startup "bash /home/fasol/startup-sh/mnt.sh"
 
 recent-windows {
@@ -213,7 +216,7 @@ binds {
     Alt+Space hotkey-overlay-title="Run an Application: Noctalia Launcher" { spawn-sh "noctalia msg panel-toggle launcher"; }
     Super+Alt+L hotkey-overlay-title="Lock the Screen: swaylock" { spawn "swaylock"; }
     Mod+B repeat=false hotkey-overlay-title="Launch a Browser" { spawn-sh "flatpak run app.zen_browser.zen"; }
-    Mod+F4 hotkey-overlay-title="Power Off" { spawn-sh "zenity --question --title='Power off' --text='Power off now?' && poweroff"; }
+    Mod+F4 { spawn-sh "poweroff"; }
     Mod+S { spawn-sh "noctalia msg panel-toggle control-center"; }
     Mod+Ctrl+V { spawn-sh "noctalia msg panel-toggle clipboard"; }
     Mod+E { spawn-sh "nautilus"; }
